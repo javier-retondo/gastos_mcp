@@ -39,6 +39,7 @@ if (!ADMIN_PASSWORD_HASH) {
 const CODEX_BIN = process.env.CODEX_BIN || 'codex';
 const CODEX_TIMEOUT_MS = Number(process.env.CODEX_TIMEOUT_MS || 10 * 60 * 1000); // 10 min
 const CODEX_PROMPT = (process.env.CODEX_PROMPT || '').trim();
+const CODEX_ARGS = (process.env.CODEX_ARGS || '').trim().split(/\s+/).filter(Boolean);
 
 // Un solo proceso a la vez (simple)
 let isProcessing = false;
@@ -243,7 +244,7 @@ app.post('/api/process', requireJwt, async (req, res) => {
     // Ajustá args a tu comando real de codex si es diferente.
     // Ejemplo genérico:
     // codex --prompt "<...>" --dir "<pendientes>"
-    const args = ['exec', prompt];
+    const args = ['exec', ...CODEX_ARGS, prompt];
 
     const child = spawn(CODEX_BIN, args, {
       shell: false,
