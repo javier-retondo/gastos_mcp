@@ -30,7 +30,7 @@ services:
       - ./pendientes:/app/pendientes
       - /root/.codex:/home/node/.codex
       - ./node_modules:/app/node_modules
-      - /root/gastos-mcp.env:/app/.env:ro
+      - /root/gastos-mcp.env:/app/.env
 
     command: >
       bash -lc "
