@@ -117,10 +117,18 @@ function requireJwt(req, res, next) {
   }
 }
 
-// ===== Rate limit login =====
+// ===== Rate limit =====
 const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
   max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_attempts_try_later' }
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 120,
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -163,6 +171,9 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     return res.status(500).json({ error: 'login_failed' });
   }
 });
+
+// ===== API rate limit =====
+app.use('/api/', apiLimiter);
 
 // ===== Upload =====
 app.post('/api/upload', requireJwt, upload.single('file'), async (req, res) => {

@@ -40,26 +40,28 @@
       </div>
     </div>
 
-    <hr style="margin:16px 0;">
+    <div id="appBox" style="display:none;">
+      <hr style="margin:16px 0;">
 
-    <!-- UPLOAD -->
-    <label>Descripción (se usa como nombre del archivo)</label>
-    <textarea id="descripcion" placeholder="Ej: gasto farmacia - cuenta personalpay - presupuesto gastos casa febrero-26 - periodo febrero-26"></textarea>
-    <div class="hint">Si no subís archivo, se crea un .txt con este contenido. Si subís archivo, la descripción se usa como nombre (mantiene extensión).</div>
+      <!-- UPLOAD -->
+      <label>Descripción (se usa como nombre del archivo)</label>
+      <textarea id="descripcion" placeholder="Ej: gasto farmacia - cuenta personalpay - presupuesto gastos casa febrero-26 - periodo febrero-26"></textarea>
+      <div class="hint">Si no subís archivo, se crea un .txt con este contenido. Si subís archivo, la descripción se usa como nombre (mantiene extensión).</div>
 
-    <label>Archivo (opcional)</label>
-    <input id="file" type="file" />
+      <label>Archivo (opcional)</label>
+      <input id="file" type="file" />
 
-    <div class="row">
-      <button id="uploadBtn">Subir</button>
-      <button id="processBtn" class="secondary">Procesar</button>
+      <div class="row">
+        <button id="uploadBtn">Subir</button>
+        <button id="processBtn" class="secondary">Procesar</button>
+      </div>
+
+      <label>Prompt (opcional si el servidor no tiene CODEX_PROMPT)</label>
+      <textarea id="prompt" placeholder="Instrucciones para codex..."></textarea>
+
+      <label>Resultado</label>
+      <pre id="out">—</pre>
     </div>
-
-    <label>Prompt (opcional si el servidor no tiene CODEX_PROMPT)</label>
-    <textarea id="prompt" placeholder="Instrucciones para codex..."></textarea>
-
-    <label>Resultado</label>
-    <pre id="out">—</pre>
   </div>
 
 <script>
@@ -70,6 +72,8 @@
   function setStatus() {
     const token = localStorage.getItem(LS_KEY);
     statusEl.textContent = token ? 'Autenticado' : 'No autenticado';
+    document.getElementById('loginBox').style.display = token ? 'none' : 'block';
+    document.getElementById('appBox').style.display = token ? 'block' : 'none';
   }
 
   function authHeaders(extra = {}) {
