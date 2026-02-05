@@ -28,7 +28,7 @@ services:
     volumes:
       - ./:/app
       - ./pendientes:/app/pendientes
-      - ./codex-home:/home/node
+      - /root/.codex:/home/node/.codex
       - ./node_modules:/app/node_modules
 
     command: >
