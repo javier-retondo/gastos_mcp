@@ -7,22 +7,13 @@ services:
     working_dir: /app
     ports:
       - "3101:3101"
+    env_file:
+      - /root/gastos-mcp.env
     environment:
       PORT: "3101"
       PENDIENTES_DIR: "/app/pendientes"
-
-      # JWT
-      JWT_SECRET: "${JWT_SECRET}"
-      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN}"
-      ADMIN_PASSWORD_HASH: "${ADMIN_PASSWORD_HASH}"
-
-      # Codex
       CODEX_BIN: "codex"
       CODEX_TIMEOUT_MS: "600000"
-      # Prompt fijo recomendado (configurable por .env)
-      CODEX_PROMPT: "${CODEX_PROMPT}"
-
-      # Persistencia de sesión codex
       HOME: "/home/node"
 
     volumes:
