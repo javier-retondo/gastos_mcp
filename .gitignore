@@ -1,0 +1,6 @@
+node_modules
+.env
+AGENTS.md
+.vscode
+pendientes
+procesados

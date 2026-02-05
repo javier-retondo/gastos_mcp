@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gastos MCP</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 16px; }
+    .card { max-width: 560px; margin: 0 auto; padding: 16px; border: 1px solid #ddd; border-radius: 12px; }
+    label { display: block; margin-top: 12px; font-weight: 600; }
+    input, textarea, button { width: 100%; margin-top: 6px; padding: 10px; font-size: 16px; box-sizing: border-box; }
+    textarea { min-height: 110px; resize: vertical; }
+    button { cursor: pointer; border-radius: 10px; border: 1px solid #222; background: #111; color: #fff; }
+    button.secondary { background: #fff; color: #111; }
+    button.danger { background: #b00020; border-color: #b00020; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f6f6; padding: 10px; border-radius: 10px; }
+    .hint { font-size: 12px; opacity: 0.75; margin-top: 6px; }
+    .pill { display:inline-block; padding: 4px 10px; border-radius: 999px; background:#f0f0f0; font-size: 12px; }
+    .top { display:flex; justify-content: space-between; align-items:center; gap: 10px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <h2 style="margin:0;">Pendientes</h2>
+      <span id="status" class="pill">No autenticado</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <label>Contraseña</label>
+      <input id="password" type="password" placeholder="Tu password" />
+      <div class="row">
+        <button id="loginBtn">Login</button>
+        <button id="logoutBtn" class="secondary">Logout</button>
+      </div>
+      <div class="hint">
+        El token JWT se guarda en <b>localStorage</b>. Si alguien accede al navegador, podría usarlo.
+      </div>
+    </div>
+
+    <hr style="margin:16px 0;">
+
+    <!-- UPLOAD -->
+    <label>Descripción (se usa como nombre del archivo)</label>
+    <textarea id="descripcion" placeholder="Ej: gasto farmacia - cuenta personalpay - presupuesto gastos casa febrero-26 - periodo febrero-26"></textarea>
+    <div class="hint">Si no subís archivo, se crea un .txt con este contenido. Si subís archivo, la descripción se usa como nombre (mantiene extensión).</div>
+
+    <label>Archivo (opcional)</label>
+    <input id="file" type="file" />
+
+    <div class="row">
+      <button id="uploadBtn">Subir</button>
+      <button id="processBtn" class="secondary">Procesar</button>
+    </div>
+
+    <label>Prompt (opcional si el servidor no tiene CODEX_PROMPT)</label>
+    <textarea id="prompt" placeholder="Instrucciones para codex..."></textarea>
+
+    <label>Resultado</label>
+    <pre id="out">—</pre>
+  </div>
+
+<script>
+  const LS_KEY = 'gastos_mcp_jwt';
+  const out = document.getElementById('out');
+  const statusEl = document.getElementById('status');
+
+  function setStatus() {
+    const token = localStorage.getItem(LS_KEY);
+    statusEl.textContent = token ? 'Autenticado' : 'No autenticado';
+  }
+
+  function authHeaders(extra = {}) {
+    const token = localStorage.getItem(LS_KEY);
+    if (!token) return extra;
+    return { ...extra, Authorization: 'Bearer ' + token };
+  }
+
+  setStatus();
+
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    try {
+      out.textContent = 'Logueando...';
+      const password = document.getElementById('password').value;
+
+      const r = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+
+      const j = await r.json();
+      if (!r.ok) {
+        out.textContent = JSON.stringify(j, null, 2);
+        return;
+      }
+
+      localStorage.setItem(LS_KEY, j.accessToken);
+      setStatus();
+      out.textContent = 'OK: logueado.';
+    } catch (e) {
+      out.textContent = String(e);
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(LS_KEY);
+    setStatus();
+    out.textContent = 'Logout OK.';
+  });
+
+  document.getElementById('uploadBtn').addEventListener('click', async () => {
+    try {
+      out.textContent = 'Subiendo...';
+
+      const token = localStorage.getItem(LS_KEY);
+      if (!token) { out.textContent = 'Primero hacé login.'; return; }
+
+      const descripcion = document.getElementById('descripcion').value.trim();
+      if (!descripcion) { out.textContent = 'Falta descripción.'; return; }
+
+      const file = document.getElementById('file').files[0] || null;
+
+      const fd = new FormData();
+      fd.append('descripcion', descripcion);
+      if (file) fd.append('file', file);
+
+      const r = await fetch('/api/upload', {
+        method: 'POST',
+        headers: authHeaders(), // NO setear Content-Type acá
+        body: fd
+      });
+
+      const j = await r.json();
+      out.textContent = JSON.stringify(j, null, 2);
+    } catch (e) {
+      out.textContent = String(e);
+    }
+  });
+
+  document.getElementById('processBtn').addEventListener('click', async () => {
+    try {
+      out.textContent = 'Procesando...';
+
+      const token = localStorage.getItem(LS_KEY);
+      if (!token) { out.textContent = 'Primero hacé login.'; return; }
+
+      const prompt = document.getElementById('prompt').value.trim();
+
+      const r = await fetch('/api/process', {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ prompt })
+      });
+
+      const j = await r.json();
+      out.textContent = JSON.stringify(j, null, 2);
+    } catch (e) {
+      out.textContent = String(e);
+    }
+  });
+</script>
+</body>
+</html>

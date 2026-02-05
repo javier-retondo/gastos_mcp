@@ -1,0 +1,17 @@
+{
+  "name": "gastos_mcp",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "hash:pass": "node -e \"const bcrypt=require('bcryptjs'); bcrypt.hash(process.argv[1],12).then(console.log)\""
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

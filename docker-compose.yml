@@ -1,0 +1,46 @@
+services:
+  gastos_mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gastos_mcp
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      PENDIENTES_DIR: "/app/pendientes"
+
+      # JWT
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN}"
+      ADMIN_PASSWORD_HASH: "${ADMIN_PASSWORD_HASH}"
+
+      # Codex
+      CODEX_BIN: "codex"
+      CODEX_TIMEOUT_MS: "600000"
+      # Prompt fijo recomendado (configurable por .env)
+      CODEX_PROMPT: "${CODEX_PROMPT}"
+
+      # Persistencia de sesión codex
+      HOME: "/home/node"
+
+    volumes:
+      - ./:/app
+      - ./pendientes:/app/pendientes
+      - ./codex-home:/home/node
+      - ./node_modules:/app/node_modules
+
+    command: >
+      bash -lc "
+        set -e;
+        mkdir -p /app/pendientes /home/node;
+        npm install;
+        node server.js
+      "
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
