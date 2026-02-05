@@ -12,8 +12,8 @@ const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-// Behind reverse proxy
-app.set('trust proxy', true);
+// Behind reverse proxy (one hop)
+app.set('trust proxy', 1);
 
 app.use(express.json({ limit: '256kb' }));
 app.use(express.urlencoded({ extended: true, limit: '256kb' }));
