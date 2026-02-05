@@ -64,6 +64,7 @@
 <script src="config.js"></script>
 <script>
   const BASE_URL = (window.__BASE_URL || '').replace(/\/+$/, '');
+  console.log('BASE_URL :>> ', BASE_URL);
   const apiUrl = (path) => (BASE_URL ? `${BASE_URL}${path}` : path);
 
   const LS_KEY = 'gastos_mcp_jwt';
