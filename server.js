@@ -64,7 +64,7 @@ function sanitizeBaseName(input) {
   s = s.replace(/\.+/g, '.').replace(/^\.*/, '').replace(/\.{2,}/g, '.');
 
   if (!s) s = 'sin-descripcion';
-  if (s.length > 80) s = s.slice(0, 80);
+  // No truncar: el nombre lo define el usuario
 
   return s;
 }
@@ -243,7 +243,7 @@ app.post('/api/process', requireJwt, async (req, res) => {
     // Ajustá args a tu comando real de codex si es diferente.
     // Ejemplo genérico:
     // codex --prompt "<...>" --dir "<pendientes>"
-    const args = ['--prompt', prompt, '--dir', PENDIENTES_DIR];
+    const args = [prompt];
 
     const child = spawn(CODEX_BIN, args, {
       shell: false,
