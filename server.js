@@ -243,7 +243,7 @@ app.post('/api/process', requireJwt, async (req, res) => {
     // Ajustá args a tu comando real de codex si es diferente.
     // Ejemplo genérico:
     // codex --prompt "<...>" --dir "<pendientes>"
-    const args = [prompt];
+    const args = ['exec', prompt];
 
     const child = spawn(CODEX_BIN, args, {
       shell: false,
