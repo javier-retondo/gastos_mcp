@@ -223,8 +223,20 @@ app.post('/api/process', requireJwt, async (req, res) => {
     const promptFromClient = String(req.body.prompt || '').trim();
     const prompt = (CODEX_PROMPT || promptFromClient).trim();
 
-    if (!prompt) return res.status(400).json({ error: 'prompt_required' });
+    if (!prompt) {
+      console.warn('[process] missing prompt', {
+        hasEnvPrompt: Boolean(CODEX_PROMPT),
+        hasClientPrompt: Boolean(promptFromClient)
+      });
+      return res.status(400).json({ error: 'prompt_required' });
+    }
     if (prompt.length > 4000) return res.status(400).json({ error: 'prompt_too_long' });
+
+    console.log('[process] starting', {
+      promptSource: CODEX_PROMPT ? 'env' : 'client',
+      promptLength: prompt.length,
+      promptPreview: prompt.slice(0, 200)
+    });
 
     isProcessing = true;
 
