@@ -24,8 +24,6 @@ services:
 
       # Persistencia de sesión codex
       HOME: "/home/node"
-    env_file:
-      - /root/gastos-mcp.env
 
     volumes:
       - ./:/app
