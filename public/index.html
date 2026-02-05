@@ -61,11 +61,14 @@
     </div>
   </div>
 
-<script src="config.js"></script>
 <script>
-  const BASE_URL = (window.__BASE_URL || '').replace(/\/+$/, '');
-  console.log('BASE_URL :>> ', BASE_URL);
-  const apiUrl = (path) => (BASE_URL ? `${BASE_URL}${path}` : path);
+  const basePath = (() => {
+    const p = window.location.pathname || '/';
+    const parts = p.split('/').filter(Boolean);
+    if (parts.length === 0) return '';
+    return '/' + parts[0];
+  })();
+  const apiUrl = (path) => `${basePath}${path}`;
 
   const LS_KEY = 'gastos_mcp_jwt';
   const out = document.getElementById('out');
