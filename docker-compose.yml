@@ -24,6 +24,8 @@ services:
 
       # Persistencia de sesión codex
       HOME: "/home/node"
+    env_file:
+      - /root/gastos-mcp.env
 
     volumes:
       - ./:/app
@@ -40,7 +42,7 @@ services:
       "
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:3101/api/health"]
       interval: 30s
       timeout: 5s
       retries: 5
