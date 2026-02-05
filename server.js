@@ -19,6 +19,7 @@ app.use(express.urlencoded({ extended: true, limit: '256kb' }));
 // ===== Config =====
 const PORT = Number(process.env.PORT || 3000);
 const PENDIENTES_DIR = process.env.PENDIENTES_DIR || path.join(__dirname, 'pendientes');
+const BASE_URL = (process.env.BASE_URL || '').replace(/\/+$/, '');
 
 // Auth
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -147,6 +148,12 @@ app.use('/', express.static(path.join(__dirname, 'public'), {
   etag: true,
   maxAge: '1h'
 }));
+
+// Expose runtime config to frontend
+app.get('/config.js', (req, res) => {
+  res.type('application/javascript');
+  res.send(`window.__BASE_URL=${JSON.stringify(BASE_URL)};`);
+});
 
 // ===== Auth =====
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
