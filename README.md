@@ -61,6 +61,15 @@ docker exec -it gastos_mcp bash
 codex login
 ```
 
+### Login en VPS (headless)
+Si estás en un servidor sin navegador, usá device code:
+```
+docker exec -it gastos_mcp bash
+codex login --device-auth
+```
+Luego abrís el link en tu navegador local e ingresás el código.  
+Este flujo está soportado por Codex CLI para entornos headless. citeturn0search0
+
 ## Flujo de uso
 1. Abrís la web.
 2. Logueás con la contraseña del admin.
