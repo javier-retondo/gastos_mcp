@@ -6,9 +6,9 @@ services:
     container_name: gastos_mcp
     working_dir: /app
     ports:
-      - "3000:3000"
+      - "3101:3101"
     environment:
-      PORT: "3000"
+      PORT: "3101"
       PENDIENTES_DIR: "/app/pendientes"
 
       # JWT
